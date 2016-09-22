@@ -2,19 +2,20 @@
 
 
 import React from 'react';
-let { View, StyleSheet, TextInput, Text, DatePickerIOS} = require('react-native');
+let { View, StyleSheet, TextInput, Text, DatePickerAndroid} = require('react-native');
 import {Field} from './Field';
 
 
-  export class DatePickerField extends React.Component{
+  export class DatePickerComponent extends React.Component{
     constructor(props){
-      super();
+      super(props);
       this.state = {
         date: props.date? new Date(props.date) :'',
         isPickerVisible: false
       }
 
     }
+
     handleLayoutChange(e){
       let {x, y, width, height} = {... e.nativeEvent.layout};
 
@@ -26,20 +27,39 @@ import {Field} from './Field';
 
       this.setState({date:date});
 
-      if(this.props.onChange)      this.props.onChange(this.props.fieldRef, date);
+      if(this.props.onChange)      this.props.onChange((this.props.prettyPrint)?this.props.dateTimeFormat(date):date);
       if(this.props.onValueChange) this.props.onValueChange(date);
     }
-
+    setDate(date){
+      this.setState({date:date});
+      if(this.props.onChange)      this.props.onChange((this.props.prettyPrint)?this.props.dateTimeFormat(date):date);
+      if(this.props.onValueChange) this.props.onValueChange(date);
+    }
 
 
 //      this.refs.picker.measure(this.getPickerLayout.bind(this));
 
 
-    _togglePicker(event){
-        this.setState({isPickerVisible:!this.state.isPickerVisible});
-        //this._scrollToInput(event);
+    async _togglePicker(event){
+      try {
+
+        const {action, year, month, day} = await DatePickerAndroid.open({
+          date: this.props.date || new Date()
+        });
+        if (action !== DatePickerAndroid.dismissedAction) {
+          this.handleValueChange(new Date(year,month,day));
+          // Selected year, month (0-11), day
+        }
+      } catch ({code, message}) {
+          console.warn('Cannot open time picker', message);
+      }
+      this.props.onPress && this.props.onPress(event);
     }
+    
     render(){
+      let placeholderComponent = (this.props.placeholderComponent)
+                        ? this.props.placeholderComponent
+                        : <Text style={[formStyles.fieldText, this.props.placeholderStyle]}>{this.props.placeholder}</Text>
       return(<View><Field
         {...this.props}
         ref='inputBox'
@@ -49,22 +69,19 @@ import {Field} from './Field';
             this.props.containerStyle]}
           onLayout={this.handleLayoutChange.bind(this)}>
 
-          <Text style={formStyles.fieldText}>{this.props.placeholder}</Text>
+          {placeholderComponent}
           <View style={[formStyles.alignRight, formStyles.horizontalContainer]}>
-            <Text style={formStyles.fieldValue}>{
+            <Text style={[formStyles.fieldValue,this.props.valueStyle ]}>{
             (this.state.date)?this.state.date.toLocaleDateString():""
           }</Text>
 
 
           </View>
-          {(this.props.iconRight)
-              ? this.props.iconRight
-              : null
-            }
+
         </View>
         </Field>
         {(this.state.isPickerVisible)?
-          <DatePickerIOS
+          <DatePickerAndroid
             {...this.props}
            date={this.state.date || new Date()}
 
@@ -80,7 +97,16 @@ import {Field} from './Field';
 
   }
 
+  DatePickerComponent.propTypes = {
+    dateTimeFormat: React.PropTypes.func
+  }
 
+  DatePickerComponent.defaultProps = {
+    dateTimeFormat: (date)=>{
+      if(!date) return "";
+      return date.toLocaleDateString()
+    }
+  };
 
     let formStyles = StyleSheet.create({
       form:{
