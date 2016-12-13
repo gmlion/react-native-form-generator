@@ -118,35 +118,35 @@ export class PickerComponent extends React.Component{
                     : iconRight[1]
       }
       return(<View><Field
-        {...this.props}
-        ref='inputBox'
-        onPress={this._togglePicker.bind(this)}>
-        <View style={
-                      this.props.containerStyle}
-          onLayout={this.handleLayoutChange.bind(this)}>
-          {(iconLeft)
-            ? iconLeft
-            : null
-          }
-          <Text style={this.props.labelStyle}>{this.props.label}</Text>
-          <View style={this.props.valueContainerStyle}>
-            <Text style={this.props.valueStyle}>
-              {(this.state.value)?this.props.options[this.state.value]:''}
-            </Text>
-
-          </View>
-          {(this.props.iconRight)
-              ? this.props.iconRight
+          {...this.props}
+          ref='inputBox'
+          onPress={this._togglePicker.bind(this)}>
+          <View style={
+                        this.props.containerStyle}
+            onLayout={this.handleLayoutChange.bind(this)}>
+            {(iconLeft)
+              ? iconLeft
               : null
             }
+            <Text style={this.props.labelStyle}>{this.props.label}</Text>
+            <View style={this.props.valueContainerStyle}>
+              <Text style={this.props.valueStyle}>
+                {(this.state.value)?this.props.options[this.state.value]:''}
+              </Text>
 
-        </View>
-        </Field>
-        {(this.state.isPickerVisible)?
-          pickerWrapper : null
-        }
+            </View>
+            {(this.props.iconRight)
+                ? this.props.iconRight
+                : null
+              }
 
-    </View>
+          </View>
+          </Field>
+          {(this.state.isPickerVisible)?
+            pickerWrapper : null
+          }
+
+      </View>
       )
     }
 

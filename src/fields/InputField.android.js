@@ -25,7 +25,18 @@ export class InputField extends React.Component{
       onValidation={this.handleValidation.bind(this)}
       //onChange={this.handleChange.bind(this)}
       //ref={this.props.fieldRef}
+
+      containerStyle={[
+            formStyles.horizontalContainer,
+            this.props.containerStyle,
+          ]}
       />
     );
   }
 }
+
+let formStyles = StyleSheet.create({
+  horizontalContainer: {
+    alignItems: 'flex-start'
+  }
+});
